@@ -7,10 +7,15 @@ def send_alert(symbol: str, signal_data: dict, ai_interpretation: str):
     """
     构建并发送一个 notifyx 消息
     """
-    webhook_url = NOTIFYX_WEBHOOK_URL
-    if not webhook_url:
+    webhook_token_or_url = NOTIFYX_WEBHOOK_URL
+    if not webhook_token_or_url:
         print("NotifyX webhook URL not set.")
         return
+
+    if webhook_token_or_url.startswith('http'):
+        webhook_url = webhook_token_or_url
+    else:
+        webhook_url = f"https://www.notifyx.cn/api/v1/send/{webhook_token_or_url}"
 
     primary_signal = signal_data.get('primary_signal', {})
     indicator_name = primary_signal.get('indicator', 'N/A')
@@ -34,7 +39,7 @@ def send_alert(symbol: str, signal_data: dict, ai_interpretation: str):
     
     ai_interpretation_formatted = "\n\n".join(ai_sections)
 
-    message = (
+    content = (
         f"🚨 **{symbol} 市场异动告警** 🚨\n\n"
         f"**指标:** {indicator_name}\n"
         f"**信号详情:** {details_string}\n\n"
@@ -42,9 +47,8 @@ def send_alert(symbol: str, signal_data: dict, ai_interpretation: str):
     )
 
     payload = {
-        "message": message,
-        "title": f"{symbol} 市场异动告警",
-        "priority": "high"
+        "content": content,
+        "title": f"{symbol} 市场异动告警"
     }
 
     try:
