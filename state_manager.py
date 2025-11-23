@@ -14,18 +14,26 @@ class SignalStateManager:
 
         # 检查Z-Score类型的信号
         if 'z_score' in current_signal['primary_signal'] and 'z_score' in previous_signal['primary_signal']:
-            new_z = current_signal['primary_signal']['z_score']
-            old_z = previous_signal['primary_signal']['z_score']
-            if abs(new_z - old_z) >= Z_SCORE_CHANGE_THRESHOLD:
-                return True
+            try:
+                new_z = float(current_signal['primary_signal']['z_score'])
+                old_z = float(previous_signal['primary_signal']['z_score'])
+                if abs(new_z - old_z) >= Z_SCORE_CHANGE_THRESHOLD:
+                    return True
+            except (ValueError, TypeError):
+                # 如果转换失败，则忽略此检查
+                pass
 
         # 检查百分比类型的信号 (例如 OI 变化)
         if 'change' in current_signal['primary_signal'] and 'change' in previous_signal['primary_signal']:
              # 假设 'change' 键存在于信号中
-            new_change = current_signal['primary_signal'].get('change', 0)
-            old_change = previous_signal['primary_signal'].get('change', 0)
-            if abs(new_change - old_change) >= PERCENTAGE_CHANGE_THRESHOLD:
-                return True
+            try:
+                new_change = float(current_signal['primary_signal'].get('change', 0))
+                old_change = float(previous_signal['primary_signal'].get('change', 0))
+                if abs(new_change - old_change) >= PERCENTAGE_CHANGE_THRESHOLD:
+                    return True
+            except (ValueError, TypeError):
+                # 如果转换失败，则忽略此检查
+                pass
 
         # 默认情况下，如果没有特定逻辑匹配，则认为没有显著变化
         # 这可以防止对同一事件的重复、无价值的警报
