@@ -1,15 +1,14 @@
 import requests
 import json
 from datetime import datetime
-from config import NOTIFYX_WEBHOOK_URL
+from config import NOTIFYX_WEBHOOK_URLS
 
 def send_alert(symbol: str, signal_data: dict, ai_interpretation: str):
     """
-    构建并发送一个 notifyx 消息
+    构建并向所有配置的 notifyx webhook 发送消息
     """
-    webhook_url = NOTIFYX_WEBHOOK_URL
-    if not webhook_url:
-        print("NotifyX webhook URL not set.")
+    if not NOTIFYX_WEBHOOK_URLS:
+        print("NotifyX webhook URLs are not set.")
         return
 
     primary_signal = signal_data.get('primary_signal', {})
@@ -34,7 +33,7 @@ def send_alert(symbol: str, signal_data: dict, ai_interpretation: str):
     
     ai_interpretation_formatted = "\n\n".join(ai_sections)
 
-    message = (
+    content = (
         f"🚨 **{symbol} 市场异动告警** 🚨\n\n"
         f"**指标:** {indicator_name}\n"
         f"**信号详情:** {details_string}\n\n"
@@ -42,14 +41,18 @@ def send_alert(symbol: str, signal_data: dict, ai_interpretation: str):
     )
 
     payload = {
-        "message": message,
-        "title": f"{symbol} 市场异动告警",
-        "priority": "high"
+        "content": content,
+        "title": f"{symbol} 市场异动告警"
     }
 
-    try:
-        response = requests.post(webhook_url, data=json.dumps(payload), headers={'Content-Type': 'application/json'})
-        response.raise_for_status()
-        print("NotifyX alert sent successfully.")
-    except requests.exceptions.RequestException as e:
-        print(f"Error sending NotifyX alert: {e}")
+    for webhook_token_or_url in NOTIFYX_WEBHOOK_URLS:
+        if webhook_token_or_url.startswith('http'):
+            webhook_url = webhook_token_or_url
+        else:
+            webhook_url = f"https://www.notifyx.cn/api/v1/send/{webhook_token_or_url}"
+        try:
+            response = requests.post(webhook_url, data=json.dumps(payload), headers={'Content-Type': 'application/json'})
+            response.raise_for_status()
+            print(f"NotifyX alert sent successfully to {webhook_url}")
+        except requests.exceptions.RequestException as e:
+            print(f"Error sending NotifyX alert to {webhook_url}: {e}")

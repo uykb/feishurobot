@@ -4,7 +4,9 @@ from dotenv import load_dotenv
 load_dotenv()
 # --- API Keys & Webhooks ---
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-NOTIFYX_WEBHOOK_URL = os.getenv("NOTIFYX_WEBHOOK_URL")
+# 处理多个 NotifyX Webhook URLs
+webhook_urls_str = os.getenv("NOTIFYX_WEBHOOK_URL", "")
+NOTIFYX_WEBHOOK_URLS = [url.strip() for url in webhook_urls_str.split(',') if url.strip()]
 
 # --- Gemini Model Settings ---
 # 默认模型名称
