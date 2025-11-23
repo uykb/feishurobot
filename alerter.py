@@ -1,5 +1,6 @@
 import requests
 import json
+import time
 from datetime import datetime
 from config import NOTIFYX_WEBHOOK_URLS
 
@@ -56,3 +57,4 @@ def send_alert(symbol: str, signal_data: dict, ai_interpretation: str):
             print(f"NotifyX alert sent successfully to {webhook_url}")
         except requests.exceptions.RequestException as e:
             print(f"Error sending NotifyX alert to {webhook_url}: {e}")
+        time.sleep(1) # a brief pause to prevent rate-limiting issues
