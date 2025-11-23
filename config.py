@@ -8,6 +8,10 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 webhook_urls_str = os.getenv("NOTIFYX_WEBHOOK_URL", "")
 NOTIFYX_WEBHOOK_URLS = [url.strip() for url in webhook_urls_str.split(',') if url.strip()]
 
+# --- Gotify Settings ---
+GOTIFY_URL = os.getenv("GOTIFY_URL")
+GOTIFY_TOKEN = os.getenv("GOTIFY_TOKEN")
+
 # --- Gemini Model Settings ---
 # 默认模型名称
 GEMINI_MODEL_NAME = "gemini-2.5-flash" 
