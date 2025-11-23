@@ -1,6 +1,17 @@
 import pandas as pd
-import pandas_ta as ta
 from config import *
+
+def calculate_ema(series: pd.Series, length: int):
+    """手动计算指数移动平均线 (EMA)"""
+    return series.ewm(span=length, adjust=False).mean()
+
+def calculate_rsi(series: pd.Series, length: int):
+    """手动计算相对强弱指数 (RSI)"""
+    delta = series.diff()
+    gain = (delta.where(delta > 0, 0)).rolling(window=length).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=length).mean()
+    rs = gain / loss
+    return 100 - (100 / (1 + rs))
 
 def _create_market_snapshot(df: pd.DataFrame, primary_signal: dict):
     """
@@ -21,9 +32,9 @@ def _create_market_snapshot(df: pd.DataFrame, primary_signal: dict):
     }
     
     # 3. 计算额外的技术指标 (RSI, EMA)
-    df.ta.rsi(length=14, append=True)
-    df.ta.ema(length=12, append=True)
-    df.ta.ema(length=26, append=True)
+    df['RSI_14'] = calculate_rsi(df['close'], 14)
+    df['EMA_12'] = calculate_ema(df['close'], 12)
+    df['EMA_26'] = calculate_ema(df['close'], 26)
     
     latest_tech_indicators = df.tail(1)
     tech_indicators = {

@@ -8,6 +8,5 @@ dependencies:
   - pandas
   - python-dotenv
   - schedule
-  - pandas-ta
   - pip:
     - openai
