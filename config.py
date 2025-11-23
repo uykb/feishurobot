@@ -34,9 +34,6 @@ LS_RATIO_Z_SCORE_THRESHOLD = 2.0 # 多空比Z-Score异动阈值
 LS_RATIO_LOOKBACK_PERIOD = 96    # 多空比回看周期
 
 # --- State Management (Memory) Settings ---
-# 信号冷却时间（分钟），在此时间内，相似的信号不会重复发送
-SIGNAL_COOLDOWN_PERIOD = 120  # 120分钟 = 2小时
-
 # Z-Score 类信号的显著变化阈值
 # 只有当新的 Z-Score 与上次发送的 Z-Score 差值的绝对值大于此阈值时，才被视为新信号
 Z_SCORE_CHANGE_THRESHOLD = 0.5
