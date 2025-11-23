@@ -1,6 +1,16 @@
 import time
 import schedule
+import warnings
 from datetime import datetime
+
+# 忽略 pandas_ta 库中的特定弃用警告
+warnings.filterwarnings(
+    "ignore",
+    message="pkg_resources is deprecated as an API.",
+    category=UserWarning,
+    module="pandas_ta"
+)
+
 from config import SYMBOLS, TIMEFRAME, DYNAMIC_SYMBOLS
 from data_fetcher import get_binance_data, get_top_liquid_symbols
 from indicators import VolumeSignal, OpenInterestSignal, LSRatioSignal
