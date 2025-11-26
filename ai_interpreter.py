@@ -1,15 +1,15 @@
 import json
 from openai import OpenAI
-from config import GEMINI_API_KEY, GEMINI_MODEL_NAME, GEMINI_API_BASE_URL
+from config import DEEPSEEK_API_KEY, DEEPSEEK_MODEL_NAME, DEEPSEEK_API_BASE_URL
 
 client = OpenAI(
-    api_key=GEMINI_API_KEY,
-    base_url=GEMINI_API_BASE_URL,
+    api_key=DEEPSEEK_API_KEY,
+    base_url=DEEPSEEK_API_BASE_URL,
 )
 
-def get_gemini_interpretation(symbol: str, timeframe: str, signal_data: dict, previous_signal: dict = None):
+def get_ai_interpretation(symbol: str, timeframe: str, signal_data: dict, previous_signal: dict = None):
     """
-    使用自定义的 OpenAI 兼容 API 解读指标异动信号及其市场背景
+    使用AI模型解读指标异动信号及其市场背景
     """
     # 为了可读性，将数据包拆分
     primary_signal = signal_data.get('primary_signal', {})
@@ -65,7 +65,7 @@ This is a new signal alert.
 
     try:
         response = client.chat.completions.create(
-            model=GEMINI_MODEL_NAME,
+            model=DEEPSEEK_MODEL_NAME,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},

@@ -3,7 +3,8 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 # --- API Keys & Webhooks ---
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
+# GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 # 处理多个 NotifyX Webhook URLs
 webhook_urls_str = os.getenv("NOTIFYX_WEBHOOK_URL", "")
 NOTIFYX_WEBHOOK_URLS = [url.strip() for url in webhook_urls_str.split(',') if url.strip()]
@@ -12,11 +13,16 @@ NOTIFYX_WEBHOOK_URLS = [url.strip() for url in webhook_urls_str.split(',') if ur
 GOTIFY_URL = os.getenv("GOTIFY_URL")
 GOTIFY_TOKEN = os.getenv("GOTIFY_TOKEN")
 
-# --- Gemini Model Settings ---
+# --- AI Model Settings ---
+# DeepSeek Model Settings
+DEEPSEEK_MODEL_NAME = os.getenv("DEEPSEEK_MODEL_NAME", "deepseek-chat")
+DEEPSEEK_API_BASE_URL = os.getenv("DEEPSEEK_API_BASE_URL", "https://api.deepseek.com/v1")
+
+# --- Gemini Model Settings (Archived) ---
 # 默认模型名称
-GEMINI_MODEL_NAME = "gemini-2.5-flash" 
+# GEMINI_MODEL_NAME = "gemini-2.5-flash" 
 # 代理或自定义API地址 (如果使用官方API，请留空或注释掉)
-GEMINI_API_BASE_URL = "https://api.uykb.eu.org/v1" 
+# GEMINI_API_BASE_URL = "https://api.uykb.eu.org/v1" 
 # --- Monitoring Settings ---
 # 动态币种监控开关 (True: 自动获取热门币种, False: 使用下面的 SYMBOLS 列表)
 DYNAMIC_SYMBOLS = False

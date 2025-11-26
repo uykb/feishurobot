@@ -4,7 +4,7 @@ from datetime import datetime
 from config import SYMBOLS, TIMEFRAME, DYNAMIC_SYMBOLS
 from data_fetcher import get_binance_data, get_top_liquid_symbols
 from indicators import VolumeSignal, OpenInterestSignal, LSRatioSignal
-from ai_interpreter import get_gemini_interpretation
+from ai_interpreter import get_ai_interpretation
 from alerter import send_alert
 from state_manager import SignalStateManager
 
@@ -43,7 +43,7 @@ def run_check():
                 should_send, prev_signal = state_manager.should_send_alert(symbol, signal)
                 if should_send:
                     # 获取 AI 解读
-                    ai_insight = get_gemini_interpretation(symbol, TIMEFRAME, signal, previous_signal=prev_signal)
+                    ai_insight = get_ai_interpretation(symbol, TIMEFRAME, signal, previous_signal=prev_signal)
                     # 发送通知
                     send_alert(symbol, signal, ai_insight)
                     # 防止短时间重复发送同一个信号
