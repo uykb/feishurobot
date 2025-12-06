@@ -24,16 +24,22 @@ class SignalStateManager:
                 pass
 
         # 检查百分比类型的信号 (例如 OI 变化)
-        if 'change' in current_signal['primary_signal'] and 'change' in previous_signal['primary_signal']:
-             # 假设 'change' 键存在于信号中
-            try:
-                new_change = float(current_signal['primary_signal'].get('change', 0))
-                old_change = float(previous_signal['primary_signal'].get('change', 0))
-                if abs(new_change - old_change) >= PERCENTAGE_CHANGE_THRESHOLD:
-                    return True
-            except (ValueError, TypeError):
-                # 如果转换失败，则忽略此检查
-                pass
+        # 查找包含 'change' 的键 (如 'change_24h', 'change_1_period')
+        change_keys = [k for k in current_signal['primary_signal'].keys() if 'change' in k]
+        for key in change_keys:
+            if key in previous_signal['primary_signal']:
+                try:
+                    # 移除 % 并转换为 float (e.g., "+5.20%" -> 0.052)
+                    new_val_str = current_signal['primary_signal'][key].replace('%', '').replace('+', '')
+                    old_val_str = previous_signal['primary_signal'][key].replace('%', '').replace('+', '')
+                    
+                    new_change = float(new_val_str) / 100
+                    old_change = float(old_val_str) / 100
+                    
+                    if abs(new_change - old_change) >= PERCENTAGE_CHANGE_THRESHOLD:
+                        return True
+                except (ValueError, TypeError):
+                    continue
 
         # 默认情况下，如果没有特定逻辑匹配，则认为没有显著变化
         # 这可以防止对同一事件的重复、无价值的警报

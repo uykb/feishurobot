@@ -8,5 +8,6 @@ dependencies:
   - pandas
   - python-dotenv
   - schedule
+  - aiohttp
   - pip:
     - openai

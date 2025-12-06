@@ -2,12 +2,18 @@ import json
 from openai import OpenAI
 from config import DEEPSEEK_API_KEY, DEEPSEEK_MODEL_NAME, DEEPSEEK_API_BASE_URL
 
-client = OpenAI(
-    api_key=DEEPSEEK_API_KEY,
-    base_url=DEEPSEEK_API_BASE_URL,
-)
+if DEEPSEEK_API_KEY:
+    client = OpenAI(
+        api_key=DEEPSEEK_API_KEY,
+        base_url=DEEPSEEK_API_BASE_URL,
+    )
+else:
+    client = None
+    print("Warning: DEEPSEEK_API_KEY is not set. AI interpretation will be disabled.")
 
 def get_ai_interpretation(symbol: str, timeframe: str, signal_data: dict, previous_signal: dict = None):
+    if not client:
+        return "AI interpretation disabled (API key missing)."
     """
     使用AI模型解读指标异动信号及其市场背景
     """
