@@ -3,9 +3,15 @@ import schedule
 import asyncio
 import aiohttp
 from datetime import datetime
-from config import SYMBOLS, TIMEFRAME, DYNAMIC_SYMBOLS
+from config import SYMBOLS, TIMEFRAME, DYNAMIC_SYMBOLS, PROXY_URL
 from data_fetcher import get_binance_data, get_top_liquid_symbols
 from indicators import VolumeSignal, OpenInterestSignal, LSRatioSignal
+
+# Try to import ProxyConnector for SOCKS5 support
+try:
+    from aiohttp_socks import ProxyConnector
+except ImportError:
+    ProxyConnector = None
 from ai_interpreter import get_ai_interpretation
 from alerter import send_alert
 from state_manager import SignalStateManager
@@ -52,7 +58,18 @@ async def process_symbol(symbol: str, session: aiohttp.ClientSession, indicator_
                 )
 
 async def run_check_async():
-    async with aiohttp.ClientSession() as session:
+    connector = None
+    if PROXY_URL:
+        if ProxyConnector:
+            try:
+                connector = ProxyConnector.from_url(PROXY_URL)
+                print(f"Using proxy: {PROXY_URL}")
+            except Exception as e:
+                print(f"Failed to create proxy connector: {e}")
+        elif PROXY_URL.startswith('socks'):
+            print("Warning: SOCKS5 proxy configured but aiohttp-socks not installed. Proxy may not work.")
+
+    async with aiohttp.ClientSession(connector=connector) as session:
         # 根据配置决定使用哪个币种列表
         if DYNAMIC_SYMBOLS:
             symbols_to_check = await get_top_liquid_symbols(session)

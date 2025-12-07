@@ -11,3 +11,4 @@ dependencies:
   - aiohttp
   - pip:
     - openai
+    - aiohttp-socks
