@@ -1,7 +1,10 @@
 import aiohttp
 import asyncio
 import pandas as pd
+import logging
 from config import TIMEFRAME, DATA_FETCH_LIMIT, TOP_N_SYMBOLS
+
+logger = logging.getLogger(__name__)
 
 BASE_URL = "https://fapi.binance.com"
 
@@ -11,7 +14,7 @@ async def get_top_liquid_symbols(session: aiohttp.ClientSession):
         ticker_url = f"{BASE_URL}/fapi/v1/ticker/24hr"
         async with session.get(ticker_url) as response:
             if response.status != 200:
-                print(f"Error fetching top symbols: HTTP {response.status}")
+                logger.error(f"Error fetching top symbols: HTTP {response.status}")
                 return []
             tickers = await response.json()
         
@@ -28,11 +31,11 @@ async def get_top_liquid_symbols(session: aiohttp.ClientSession):
         # 提取前 N 个币种的名称
         symbol_list = top_symbols['symbol'].head(TOP_N_SYMBOLS).tolist()
         
-        print(f"动态获取到流动性前 {TOP_N_SYMBOLS} 的币种: {', '.join(symbol_list)}")
+        logger.info(f"动态获取到流动性前 {TOP_N_SYMBOLS} 的币种: {', '.join(symbol_list)}")
         return symbol_list
         
     except Exception as e:
-        print(f"动态获取热门币种列表失败: {e}")
+        logger.error(f"动态获取热门币种列表失败: {e}", exc_info=True)
         return []
 
 async def fetch_json(session: aiohttp.ClientSession, url: str, params: dict):
@@ -41,10 +44,10 @@ async def fetch_json(session: aiohttp.ClientSession, url: str, params: dict):
             if response.status == 200:
                 return await response.json()
             else:
-                print(f"Error fetching {url}: HTTP {response.status}")
+                logger.error(f"Error fetching {url}: HTTP {response.status}")
                 return None
     except Exception as e:
-        print(f"Exception fetching {url}: {e}")
+        logger.error(f"Exception fetching {url}: {e}")
         return None
 
 async def get_binance_data(symbol: str, session: aiohttp.ClientSession):
@@ -68,7 +71,7 @@ async def get_binance_data(symbol: str, session: aiohttp.ClientSession):
         klines_data, oi_data, ls_data = await asyncio.gather(klines_task, oi_task, ls_task)
         
         if not klines_data or not oi_data or not ls_data:
-            print(f"Incomplete data for {symbol}, skipping.")
+            logger.warning(f"Incomplete data for {symbol}, skipping.")
             return pd.DataFrame()
 
         # 3. Process K-lines
@@ -103,5 +106,5 @@ async def get_binance_data(symbol: str, session: aiohttp.ClientSession):
         
         return df
     except Exception as e:
-        print(f"Error fetching data for {symbol}: {e}")
+        logger.error(f"Error fetching data for {symbol}: {e}", exc_info=True)
         return pd.DataFrame()
