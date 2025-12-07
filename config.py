@@ -53,3 +53,7 @@ Z_SCORE_CHANGE_THRESHOLD = 0.5
 # 百分比类信号的显著变化阈值 (例如 OI 变化)
 # 只有当新的百分比与上次发送的百分比差值的绝对值大于此阈值时，才被视为新信号
 PERCENTAGE_CHANGE_THRESHOLD = 0.05 # 5%
+
+# --- Network Settings ---
+HTTP_PROXY = os.getenv("HTTP_PROXY")
+HTTPS_PROXY = os.getenv("HTTPS_PROXY")

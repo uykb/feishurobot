@@ -60,8 +60,16 @@ def calculate_z_score(series: pd.Series, lookback: int):
 
 class VolumeSignal:
     def check(self, df: pd.DataFrame):
+        if len(df) < VOLUME_LOOKBACK_PERIOD:
+            return None
+            
         df['volume_z_score'] = calculate_z_score(df['volume'], VOLUME_LOOKBACK_PERIOD)
         latest = df.iloc[-1]
+        
+        # Check if z_score is valid (not NaN)
+        if pd.isna(latest['volume_z_score']):
+            return None
+            
         if abs(latest['volume_z_score']) > VOLUME_Z_SCORE_THRESHOLD:
             signal = {
                 "indicator": "Volume",
@@ -75,10 +83,17 @@ class VolumeSignal:
 
 class OpenInterestSignal:
     def check(self, df: pd.DataFrame):
+        if len(df) < VOLUME_LOOKBACK_PERIOD:
+            return None
+            
         latest = df.iloc[-1]
         
         # 1. 24小时变化检测
-        oi_24h_ago = df['oi'].iloc[-VOLUME_LOOKBACK_PERIOD]
+        try:
+            oi_24h_ago = df['oi'].iloc[-VOLUME_LOOKBACK_PERIOD]
+        except IndexError:
+            return None
+            
         oi_24h_change = (latest['oi'] / oi_24h_ago) - 1
         if abs(oi_24h_change) > OI_24H_CHANGE_THRESHOLD:
             signal = {
@@ -125,8 +140,14 @@ class OpenInterestSignal:
 
 class LSRatioSignal:
     def check(self, df: pd.DataFrame):
+        if len(df) < LS_RATIO_LOOKBACK_PERIOD:
+            return None
+            
         df['ls_z_score'] = calculate_z_score(df['ls_ratio'], LS_RATIO_LOOKBACK_PERIOD)
         latest = df.iloc[-1]
+        
+        if pd.isna(latest['ls_z_score']):
+            return None
         
         if abs(latest['ls_z_score']) > LS_RATIO_Z_SCORE_THRESHOLD:
             sentiment = "Extremely Bullish (Contrarian Bearish)" if latest['ls_z_score'] > 0 else "Extremely Bearish (Contrarian Bullish)"

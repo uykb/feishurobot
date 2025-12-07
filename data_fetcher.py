@@ -1,7 +1,7 @@
 import aiohttp
 import asyncio
 import pandas as pd
-from config import TIMEFRAME, DATA_FETCH_LIMIT, TOP_N_SYMBOLS
+from config import TIMEFRAME, DATA_FETCH_LIMIT, TOP_N_SYMBOLS, HTTP_PROXY, HTTPS_PROXY
 
 BASE_URL = "https://fapi.binance.com"
 
@@ -9,7 +9,9 @@ async def get_top_liquid_symbols(session: aiohttp.ClientSession):
     """获取币安期货市场流动性最高的 N 个 USDT 交易对 (Async)"""
     try:
         ticker_url = f"{BASE_URL}/fapi/v1/ticker/24hr"
-        async with session.get(ticker_url) as response:
+        proxy = HTTPS_PROXY if ticker_url.startswith('https') else HTTP_PROXY
+        
+        async with session.get(ticker_url, proxy=proxy) as response:
             if response.status != 200:
                 print(f"Error fetching top symbols: HTTP {response.status}")
                 return []
@@ -37,7 +39,8 @@ async def get_top_liquid_symbols(session: aiohttp.ClientSession):
 
 async def fetch_json(session: aiohttp.ClientSession, url: str, params: dict):
     try:
-        async with session.get(url, params=params) as response:
+        proxy = HTTPS_PROXY if url.startswith('https') else HTTP_PROXY
+        async with session.get(url, params=params, proxy=proxy) as response:
             if response.status == 200:
                 return await response.json()
             else:
