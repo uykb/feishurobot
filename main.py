@@ -4,6 +4,7 @@ import asyncio
 import aiohttp
 import gc
 import logging
+import os
 from datetime import datetime
 from config import SYMBOLS, TIMEFRAME, DYNAMIC_SYMBOLS, PROXY_URL, CONCURRENCY_LIMIT
 from data_fetcher import get_binance_data, get_top_liquid_symbols
@@ -126,6 +127,7 @@ def run_check():
 
 if __name__ == "__main__":
     logger.info("启动加密货币指标监控器...")
+    logger.info(f"Configuration: CONCURRENCY_LIMIT={CONCURRENCY_LIMIT}, VERIFY_SSL={os.getenv('VERIFY_SSL', 'true')} (Active: {'Enabled' if os.getenv('VERIFY_SSL', 'true').lower() == 'true' else 'Disabled'})")
     # 首次启动立即执行一次
     run_check()
     
