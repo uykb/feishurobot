@@ -69,3 +69,9 @@ elif HTTP_PROXY:
     PROXY_URL = HTTP_PROXY
 elif HTTPS_PROXY:
     PROXY_URL = HTTPS_PROXY
+
+# SSL Verification (Set to False if you use a proxy with self-signed certs)
+VERIFY_SSL = os.getenv("VERIFY_SSL", "true").lower() == "true"
+
+# Concurrency Limit (Reduce if OOM/Crash occurs)
+CONCURRENCY_LIMIT = int(os.getenv("CONCURRENCY_LIMIT", "2"))

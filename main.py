@@ -5,7 +5,7 @@ import aiohttp
 import gc
 import logging
 from datetime import datetime
-from config import SYMBOLS, TIMEFRAME, DYNAMIC_SYMBOLS, PROXY_URL
+from config import SYMBOLS, TIMEFRAME, DYNAMIC_SYMBOLS, PROXY_URL, CONCURRENCY_LIMIT
 from data_fetcher import get_binance_data, get_top_liquid_symbols
 from indicators import VolumeSignal, OpenInterestSignal, LSRatioSignal
 
@@ -20,9 +20,6 @@ from state_manager import SignalStateManager
 
 # 初始化状态管理器
 state_manager = SignalStateManager()
-
-# Concurrency limit (e.g. 5 concurrent requests)
-CONCURRENCY_LIMIT = 5
 
 # Set up logging
 logging.basicConfig(

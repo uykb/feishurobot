@@ -2,7 +2,7 @@ import aiohttp
 import asyncio
 import pandas as pd
 import logging
-from config import TIMEFRAME, DATA_FETCH_LIMIT, TOP_N_SYMBOLS
+from config import TIMEFRAME, DATA_FETCH_LIMIT, TOP_N_SYMBOLS, VERIFY_SSL
 
 logger = logging.getLogger(__name__)
 
@@ -12,7 +12,9 @@ async def get_top_liquid_symbols(session: aiohttp.ClientSession):
     """获取币安期货市场流动性最高的 N 个 USDT 交易对 (Async)"""
     try:
         ticker_url = f"{BASE_URL}/fapi/v1/ticker/24hr"
-        async with session.get(ticker_url) as response:
+        # Use verify_ssl=VERIFY_SSL if session supports it, but session.get usually handles ssl=Boolean or SSLContext
+        # For aiohttp 3.x, verify_ssl is passed as ssl=Boolean to request
+        async with session.get(ticker_url, ssl=VERIFY_SSL) as response:
             if response.status != 200:
                 logger.error(f"Error fetching top symbols: HTTP {response.status}")
                 return []
@@ -40,7 +42,7 @@ async def get_top_liquid_symbols(session: aiohttp.ClientSession):
 
 async def fetch_json(session: aiohttp.ClientSession, url: str, params: dict):
     try:
-        async with session.get(url, params=params) as response:
+        async with session.get(url, params=params, ssl=VERIFY_SSL) as response:
             if response.status == 200:
                 return await response.json()
             else:
